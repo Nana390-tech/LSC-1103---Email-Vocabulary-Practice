@@ -1,0 +1,581 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LSC 1103 – Email Vocabulary & Structure</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0a1628;color:#fff;min-height:100vh}
+.hdr{background:linear-gradient(135deg,#0d3b5e,#1a6b8a);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hdr-title{font-size:1rem;font-weight:700;color:#5ccfef}
+.hdr-sub{font-size:0.7rem;color:#aadbe8;margin-top:2px}
+.score-pill{background:#f4a261;color:#0a1628;padding:6px 14px;border-radius:20px;font-weight:800;font-size:0.9rem}
+#home{padding:22px 16px;max-width:560px;margin:0 auto}
+.home-title{text-align:center;font-size:1.4rem;color:#5ccfef;font-weight:800;margin-bottom:4px}
+.home-desc{text-align:center;color:#8ab;font-size:0.82rem;margin-bottom:22px}
+.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.act-card{background:linear-gradient(145deg,#122a47,#1a5070);border-radius:14px;padding:18px 12px;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s;border:2px solid #1a4060}
+.act-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(92,207,239,.3);border-color:#5ccfef}
+.act-card.done{border-color:#4caf50}
+.act-icon{font-size:2rem;margin-bottom:8px}
+.act-name{font-size:.88rem;font-weight:700}
+.act-pts{font-size:.72rem;color:#f4a261;margin-top:3px}
+.act-full{grid-column:span 2}
+.sec{display:none;padding:18px 16px;max-width:680px;margin:0 auto}
+.sec.on{display:block}
+.back-btn{background:none;border:1.5px solid #5ccfef;color:#5ccfef;padding:5px 14px;border-radius:8px;cursor:pointer;font-size:.82rem;margin-bottom:14px}
+.back-btn:hover{background:#5ccfef;color:#0a1628}
+.sec-title{font-size:1.15rem;color:#5ccfef;font-weight:700;margin-bottom:3px}
+.sec-sub{color:#789;font-size:.78rem;margin-bottom:18px}
+.fc-wrap{perspective:1000px;height:240px;margin-bottom:14px}
+.fc{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s;cursor:pointer}
+.fc.flipped{transform:rotateY(180deg)}
+.fc-f,.fc-b{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px}
+.fc-f{background:linear-gradient(135deg,#0d3b5e,#1a6b8a);border:2px solid #5ccfef}
+.fc-b{background:linear-gradient(135deg,#0d3b2e,#1a6b4a);border:2px solid #4caf50;transform:rotateY(180deg)}
+.fc-word{font-size:2rem;font-weight:800;text-align:center}
+.fc-pos{color:#f4a261;font-size:.85rem;margin-top:4px}
+.fc-hint{color:#5ccfef;font-size:.72rem;margin-top:14px}
+.fc-def{font-size:.95rem;font-weight:600;text-align:center;margin-bottom:8px}
+.fc-ar{font-size:1.25rem;color:#ffd166;direction:rtl;text-align:center;margin-bottom:8px}
+.fc-ex{font-size:.74rem;color:#b8f0d0;text-align:center;font-style:italic}
+.fc-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:16px}
+.fc-nav button{background:#1a5070;border:none;color:#fff;padding:8px 22px;border-radius:8px;cursor:pointer;font-size:.88rem}
+.fc-nav button:hover{background:#5ccfef;color:#0a1628}
+.fc-ctr{color:#8ab;font-size:.82rem;text-align:center;margin-bottom:8px}
+.prog-bar{height:4px;background:#122a47;border-radius:2px;overflow:hidden;margin-bottom:16px}
+.prog-fill{height:100%;background:linear-gradient(90deg,#5ccfef,#4caf50);transition:width .3s}
+.m-info{text-align:center;color:#8ab;font-size:.8rem;margin-bottom:10px}
+.m-hdrs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.m-hdrs span{text-align:center;font-size:.72rem;color:#5ccfef;font-weight:700;letter-spacing:.5px}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.m-item{background:#122a47;border:2px solid #1a4060;border-radius:10px;padding:11px 8px;cursor:pointer;font-size:.8rem;text-align:center;transition:all .2s;min-height:58px;display:flex;align-items:center;justify-content:center;line-height:1.3}
+.m-item:hover{border-color:#5ccfef;background:#1a3a60}
+.m-item.sel{border-color:#f4a261;background:#2a2010;box-shadow:0 0 12px rgba(244,162,97,.3)}
+.m-item.ok{border-color:#4caf50;background:#0d2a1d;color:#4caf50;cursor:default}
+.m-item.err{border-color:#e74c3c;animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.m-nxt{display:block;margin:14px auto 0;background:#5ccfef;color:#0a1628;border:none;padding:10px 28px;border-radius:10px;font-weight:700;cursor:pointer}
+.dd-dots{display:flex;gap:5px;justify-content:center;margin-bottom:10px;flex-wrap:wrap}
+.dd-dot{width:11px;height:11px;border-radius:50%;background:#122a47}
+.dd-dot.ok{background:#4caf50}.dd-dot.bad{background:#e74c3c}.dd-dot.cur{background:#f4a261}
+.dd-score{text-align:center;color:#f4a261;font-weight:700;font-size:.85rem;margin-bottom:10px}
+.dd-card{background:linear-gradient(145deg,#122a47,#1a4070);border-radius:14px;padding:22px;text-align:center;margin-bottom:14px}
+.dd-item{font-size:1.15rem;font-weight:700;margin-bottom:20px;line-height:1.5}
+.dd-btns{display:flex;gap:14px;justify-content:center}
+.do-b{background:#4caf50;border:none;color:#fff;padding:12px 30px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;transition:transform .1s}
+.dont-b{background:#e74c3c;border:none;color:#fff;padding:12px 30px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;transition:transform .1s}
+.do-b:hover{transform:scale(1.05)}.dont-b:hover{transform:scale(1.05)}
+.dd-fb{padding:12px 16px;border-radius:10px;margin-bottom:12px;font-weight:600;font-size:.85rem;text-align:center;display:none}
+.dd-fb.ok{background:rgba(76,175,80,.15);color:#4caf50}.dd-fb.bad{background:rgba(231,76,60,.15);color:#e74c3c}
+.wb{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;padding:12px;background:#0d2238;border-radius:10px}
+.wb-lbl{font-size:.75rem;color:#5ccfef;font-weight:700;width:100%;margin-bottom:4px}
+.wb-tag{background:#122a47;border:2px solid #5ccfef;color:#5ccfef;padding:4px 12px;border-radius:16px;font-size:.8rem;font-weight:600}
+.email-box{background:#f5f8f2;color:#1a2a1a;border-radius:14px;padding:18px;font-size:.87rem;line-height:2}
+.blank-sel{background:#0d3b5e;color:#fff;border:2px solid #5ccfef;border-radius:6px;padding:2px 6px;font-size:.82rem;cursor:pointer;vertical-align:middle}
+.blank-sel.ok{border-color:#4caf50;background:#0d2a1d;color:#4caf50}
+.blank-sel.bad{border-color:#e74c3c;background:#2a0d0d;color:#e74c3c}
+.check-btn{background:#f4a261;color:#0a1628;border:none;padding:11px 28px;border-radius:10px;font-weight:700;cursor:pointer;display:block;margin:14px auto 0;font-size:.95rem}
+.fill-result{text-align:center;color:#5ccfef;font-weight:700;margin-top:10px;font-size:.9rem}
+.q-bar{height:6px;background:#122a47;border-radius:3px;margin-bottom:14px;overflow:hidden}
+.q-fill{height:100%;background:linear-gradient(90deg,#f4a261,#5ccfef);transition:width .3s}
+.q-num{color:#f4a261;font-size:.78rem;margin-bottom:6px}
+.q-text{font-size:1.05rem;font-weight:700;margin-bottom:18px;line-height:1.55}
+.q-opts{display:grid;gap:9px}
+.q-opt{background:#122a47;border:2px solid #1a4060;border-radius:10px;padding:12px 16px;cursor:pointer;font-size:.87rem;color:#fff;text-align:left;transition:all .2s;line-height:1.4}
+.q-opt:hover:not(.dis){border-color:#5ccfef;background:#1a3a60}
+.q-opt.cor{border-color:#4caf50;background:rgba(76,175,80,.15)}
+.q-opt.wrg{border-color:#e74c3c;background:rgba(231,76,60,.15)}
+.q-opt.dis{cursor:default}
+.q-fb{padding:10px 14px;border-radius:8px;margin-top:10px;font-size:.83rem;display:none}
+.q-fb.ok{background:rgba(76,175,80,.12);color:#4caf50}.q-fb.bad{background:rgba(231,76,60,.12);color:#e74c3c}
+.q-nxt{background:#5ccfef;color:#0a1628;border:none;padding:10px 28px;border-radius:10px;font-weight:700;cursor:pointer;display:block;visibility:hidden;margin:14px auto 0}
+.res{text-align:center;padding:30px 16px}
+.res-icon{font-size:4rem;margin-bottom:14px}
+.res-h{font-size:1.4rem;color:#5ccfef;margin-bottom:6px}
+.res-score{font-size:3.2rem;font-weight:800;color:#f4a261}
+.res-lbl{color:#8ab;font-size:.85rem;margin-bottom:20px}
+.res-grade{display:inline-block;padding:10px 26px;border-radius:20px;font-size:1rem;font-weight:700;margin-bottom:20px}
+.gA{background:rgba(76,175,80,.15);color:#4caf50;border:2px solid #4caf50}
+.gB{background:rgba(244,162,97,.15);color:#f4a261;border:2px solid #f4a261}
+.gC{background:rgba(92,207,239,.15);color:#5ccfef;border:2px solid #5ccfef}
+.gD{background:rgba(231,76,60,.15);color:#e74c3c;border:2px solid #e74c3c}
+.retry-btn{background:#f4a261;color:#0a1628;border:none;padding:11px 28px;border-radius:11px;font-weight:700;font-size:.95rem;cursor:pointer;margin:6px}
+.home-btn2{background:#122a47;color:#5ccfef;border:2px solid #5ccfef;padding:11px 28px;border-radius:11px;font-weight:700;font-size:.95rem;cursor:pointer;margin:6px}
+.cert-btn{background:linear-gradient(135deg,#7b2d8b,#c77dff);color:#fff;border:none;padding:11px 28px;border-radius:11px;font-weight:700;font-size:.95rem;cursor:pointer;margin:6px;box-shadow:0 4px 16px rgba(199,125,255,.35)}
+/* CERTIFICATE */
+.cert-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;display:none;align-items:center;justify-content:center;padding:14px;overflow-y:auto}
+.cert-overlay.show{display:flex}
+.cert-modal{background:#fff;border-radius:8px;max-width:660px;width:100%;position:relative;overflow:hidden}
+.cert-topbar{background:#f0f0f0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.cert-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:#555;line-height:1}
+.cert-print-btn{background:#7b2d8b;color:#fff;border:none;padding:8px 22px;border-radius:8px;font-weight:700;font-size:.82rem;cursor:pointer}
+.cert-name-row{display:flex;gap:8px;align-items:center;padding:12px 16px 0;background:#f0f0f0}
+.cert-name-row label{font-size:.78rem;color:#555;font-weight:600;white-space:nowrap}
+.cert-name-row input{flex:1;border:1.5px solid #ccc;border-radius:6px;padding:6px 10px;font-size:.9rem;outline:none;font-family:Georgia,serif}
+.cert-name-row input:focus{border-color:#7b2d8b}
+.cert-name-row button{background:#7b2d8b;color:#fff;border:none;padding:7px 16px;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:700;white-space:nowrap}
+.certificate{background:#fff;padding:38px 42px;font-family:Georgia,'Times New Roman',serif;color:#1a1a1a;border:12px solid #1a3a6e;outline:4px solid #c9a84c;outline-offset:-20px;margin:12px}
+.cert-inst{text-align:center;font-size:.75rem;letter-spacing:3px;color:#1a3a6e;text-transform:uppercase;font-family:'Segoe UI',Arial,sans-serif;font-weight:700}
+.cert-coursetag{text-align:center;font-size:.68rem;letter-spacing:2px;color:#999;font-family:'Segoe UI',Arial,sans-serif;margin-top:2px}
+.cert-div{width:70px;height:3px;background:linear-gradient(90deg,#c9a84c,#1a3a6e,#c9a84c);margin:10px auto;border-radius:2px}
+.cert-title{text-align:center;font-size:1.9rem;font-weight:700;color:#1a3a6e;font-style:italic;margin:6px 0 4px;letter-spacing:.5px}
+.cert-this{text-align:center;font-size:.72rem;letter-spacing:2.5px;text-transform:uppercase;color:#777;font-family:'Segoe UI',Arial,sans-serif;margin-bottom:10px}
+.cert-name-wrap{text-align:center;margin-bottom:10px}
+.cert-student{font-size:2rem;font-style:italic;color:#111;border-bottom:2px solid #c9a84c;display:inline-block;padding:0 28px 6px;min-width:220px}
+.cert-completed{text-align:center;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:#777;font-family:'Segoe UI',Arial,sans-serif;margin-bottom:6px}
+.cert-subject{text-align:center;font-size:1.05rem;font-weight:700;color:#1a3a6e;margin-bottom:5px}
+.cert-detail{text-align:center;font-size:.78rem;color:#666;font-family:'Segoe UI',Arial,sans-serif;margin-bottom:14px}
+.cert-detail span{color:#c9a84c;font-weight:700}
+.cert-stars{text-align:center;font-size:1rem;letter-spacing:5px;color:#c9a84c;margin:6px 0}
+.cert-footer{display:flex;align-items:flex-end;justify-content:space-between;margin-top:8px;padding-top:12px;border-top:1px solid #e0e0e0}
+.cert-sig{text-align:center;flex:1}
+.cert-sig-line{font-size:.9rem;font-weight:700;color:#1a3a6e;border-top:1.5px solid #1a3a6e;display:inline-block;padding-top:5px;min-width:160px;margin-top:28px}
+.cert-sig-role{font-size:.66rem;color:#777;font-family:'Segoe UI',Arial,sans-serif;margin-top:3px}
+.cert-seal{width:76px;height:76px;border-radius:50%;border:4px solid #c9a84c;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.52rem;color:#c9a84c;text-align:center;font-weight:700;letter-spacing:.5px;line-height:1.5;font-family:'Segoe UI',Arial,sans-serif;text-transform:uppercase;background:radial-gradient(circle,#fffdf5,#fff5d0)}
+.cert-date{font-size:.68rem;color:#999;font-family:'Segoe UI',Arial,sans-serif;margin-top:3px}
+/* PRINT */
+@media print{
+  body>*{display:none!important}
+  .cert-overlay{display:flex!important;position:static!important;background:none!important;padding:0!important;overflow:visible!important}
+  .cert-topbar,.cert-close,.cert-print-btn,.cert-name-row{display:none!important}
+  .cert-modal{box-shadow:none;max-width:100%!important;border-radius:0}
+  .certificate{margin:0;page-break-inside:avoid}
+}
+.cp{position:fixed;width:9px;height:9px;top:-10px;pointer-events:none;animation:fall linear forwards;z-index:9999}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#0d3b2e;color:#4caf50;padding:9px 22px;border-radius:20px;font-weight:700;font-size:.85rem;z-index:9998;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.footer{text-align:center;color:#456;font-size:.68rem;padding:14px;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">📧 LSC 1103 – Email Vocabulary & Structure</div>
+    <div class="hdr-sub">Prepared by: Nazila Motahari | HCT Abu Dhabi | Week 9</div>
+  </div>
+  <div class="score-pill">⭐ <span id="totalPts">0</span></div>
+</div>
+
+<!-- HOME -->
+<div id="home">
+  <div style="padding:22px 16px;max-width:560px;margin:0 auto">
+    <div class="home-title">Welcome! 📬</div>
+    <p class="home-desc">Practice email vocabulary & structure through 5 fun activities. Earn stars and master professional writing!</p>
+    <div class="act-grid">
+      <div class="act-card" id="c-flash" onclick="go('flash')">
+        <div class="act-icon">🃏</div>
+        <div class="act-name">Flashcards</div>
+        <div class="act-pts">18 words + Arabic</div>
+      </div>
+      <div class="act-card" id="c-match" onclick="go('match')">
+        <div class="act-icon">🎯</div>
+        <div class="act-name">Match It!</div>
+        <div class="act-pts">+5 pts per pair</div>
+      </div>
+      <div class="act-card" id="c-dodont" onclick="go('dodont')">
+        <div class="act-icon">✅</div>
+        <div class="act-name">DO or DON'T?</div>
+        <div class="act-pts">+2 pts per question</div>
+      </div>
+      <div class="act-card" id="c-fill" onclick="go('fill')">
+        <div class="act-icon">✍️</div>
+        <div class="act-name">Fill the Email</div>
+        <div class="act-pts">+5 pts per blank</div>
+      </div>
+      <div class="act-card act-full" id="c-quiz" onclick="go('quiz')">
+        <div class="act-icon">🏆</div>
+        <div class="act-name">Vocabulary Quiz</div>
+        <div class="act-pts">10 Questions • +5 pts each</div>
+      </div>
+    </div>
+    <div class="footer">Designed by: Nazila Motahari | LSC 1103 Professional Spoken Communication</div>
+  </div>
+</div>
+
+<!-- FLASHCARDS -->
+<div id="flash" class="sec">
+  <button class="back-btn" onclick="goHome()">← Back</button>
+  <div class="sec-title">🃏 Vocabulary Flashcards</div>
+  <div class="sec-sub">Tap a card to reveal the definition & Arabic translation.</div>
+  <div class="prog-bar"><div class="prog-fill" id="fpb" style="width:5.5%"></div></div>
+  <div class="fc-ctr" id="fcc">Card 1 / 18</div>
+  <div class="fc-wrap">
+    <div class="fc" id="fc" onclick="flip()">
+      <div class="fc-f">
+        <div class="fc-word" id="fword"></div>
+        <div class="fc-pos" id="fpos"></div>
+        <div class="fc-hint">👆 Tap to flip</div>
+      </div>
+      <div class="fc-b">
+        <div class="fc-def" id="fdef"></div>
+        <div class="fc-ar" id="far"></div>
+        <div class="fc-ex" id="fex"></div>
+      </div>
+    </div>
+  </div>
+  <div class="fc-nav">
+    <button onclick="prevCard()">← Prev</button>
+    <button onclick="nextCard()">Next →</button>
+  </div>
+</div>
+
+<!-- MATCHING -->
+<div id="match" class="sec">
+  <button class="back-btn" onclick="goHome()">← Back</button>
+  <div class="sec-title">🎯 Match It!</div>
+  <div class="sec-sub">Click a word, then click its matching definition. 3 rounds of 6 pairs each!</div>
+  <div class="m-info" id="minfo"></div>
+  <div class="m-hdrs"><span>📝 WORDS</span><span>📖 DEFINITIONS</span></div>
+  <div class="m-grid" id="mgrid"></div>
+  <button class="m-nxt" id="mnxt" style="display:none" onclick="nextRound()">Next Round →</button>
+</div>
+
+<!-- DO/DON'T -->
+<div id="dodont" class="sec">
+  <button class="back-btn" onclick="goHome()">← Back</button>
+  <div class="sec-title">✅ DO or DON'T in Professional Emails?</div>
+  <div class="sec-sub">For each item, decide if it's good practice (DO) or something to avoid (DON'T).</div>
+  <div class="dd-dots" id="dddots"></div>
+  <div class="dd-score">Score: <span id="dds">0</span> / <span id="ddt">12</span></div>
+  <div class="dd-fb" id="ddfb"></div>
+  <div class="dd-card">
+    <div class="dd-item" id="dditem">Loading...</div>
+    <div class="dd-btns">
+      <button class="do-b" id="doBtn" onclick="ansDD(true)">✅ DO</button>
+      <button class="dont-b" id="dontBtn" onclick="ansDD(false)">❌ DON'T</button>
+    </div>
+  </div>
+</div>
+
+<!-- FILL -->
+<div id="fill" class="sec">
+  <button class="back-btn" onclick="goHome()">← Back</button>
+  <div class="sec-title">✍️ Fill the Professional Email</div>
+  <div class="sec-sub">Choose the correct word from each dropdown to complete the formal email below.</div>
+  <div class="wb">
+    <div class="wb-lbl">📚 Word Bank:</div>
+    <span class="wb-tag">acknowledge</span><span class="wb-tag">urgent</span><span class="wb-tag">reschedule</span>
+    <span class="wb-tag">attachment</span><span class="wb-tag">clarify</span><span class="wb-tag">apologize</span>
+  </div>
+  <div class="email-box" id="ebox"></div>
+  <button class="check-btn" onclick="checkFill()">Check Answers ✓</button>
+  <div class="fill-result" id="fillres"></div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="sec">
+  <button class="back-btn" onclick="goHome()">← Back</button>
+  <div class="sec-title">🏆 Vocabulary Quiz</div>
+  <div class="sec-sub">10 questions – choose the best answer for each one!</div>
+  <div class="q-bar"><div class="q-fill" id="qfill" style="width:0%"></div></div>
+  <div class="q-num" id="qnum">Question 1 / 10</div>
+  <div class="q-text" id="qtext"></div>
+  <div class="q-opts" id="qopts"></div>
+  <div class="q-fb" id="qfb"></div>
+  <button class="q-nxt" id="qnxt" onclick="nextQ()" style="visibility:hidden">Next →</button>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="sec">
+  <div class="res">
+    <div class="res-icon" id="ricon">🏆</div>
+    <div class="res-h" id="rh">Activity Complete!</div>
+    <div class="res-score" id="rscore">8/10</div>
+    <div class="res-lbl" id="rlbl">points earned</div>
+    <div class="res-grade" id="rgrade">Excellent!</div><br>
+    <button class="retry-btn" id="rretry">🔄 Try Again</button>
+    <button class="home-btn2" onclick="goHome()">🏠 Home</button>
+    <button class="cert-btn" onclick="openCert()">🎓 Get Certificate</button>
+  </div>
+  <div class="footer">Designed by: Nazila Motahari | LSC 1103 | HCT Abu Dhabi</div>
+</div>
+
+<!-- CERTIFICATE OVERLAY -->
+<div class="cert-overlay" id="certOverlay">
+  <div class="cert-modal">
+    <div class="cert-topbar">
+      <div class="cert-name-row" style="padding:0;background:none;flex:1">
+        <label>👤 Student Name:</label>
+        <input type="text" id="certNameInput" placeholder="Type name then press Update…">
+        <button onclick="updateCertName()">Update</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-left:10px">
+        <button class="cert-print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+        <button class="cert-close" onclick="closeCert()">✕</button>
+      </div>
+    </div>
+    <div class="certificate">
+      <div class="cert-inst">Higher Colleges of Technology</div>
+      <div class="cert-coursetag">Abu Dhabi &nbsp;|&nbsp; LSC 1103 – Professional Spoken Communication</div>
+      <div class="cert-div"></div>
+      <div class="cert-stars">✦ ✦ ✦</div>
+      <div class="cert-title">Certificate of Completion</div>
+      <div class="cert-this">This is to certify that</div>
+      <div class="cert-name-wrap">
+        <div class="cert-student" id="certStudentName">Student Name</div>
+      </div>
+      <div class="cert-completed">has successfully completed</div>
+      <div class="cert-subject">Email Vocabulary &amp; Structure – Week 9</div>
+      <div class="cert-detail">Activity Score: <span id="certScore">—</span> &nbsp;|&nbsp; Total Points Earned: <span id="certPts">0</span> ⭐</div>
+      <div class="cert-stars" style="font-size:.75rem">✦ ✦ ✦</div>
+      <div class="cert-footer">
+        <div class="cert-sig">
+          <div style="height:24px"></div>
+          <div class="cert-sig-line">Nazila Motahari</div>
+          <div class="cert-sig-role">English &amp; ESP Instructor | HCT Abu Dhabi</div>
+          <div class="cert-date" id="certDate"></div>
+        </div>
+        <div style="text-align:center">
+          <div class="cert-seal">HCT<br>Abu Dhabi<br>★<br>LSC<br>1103</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const V=[
+  {w:"Acknowledge",p:"v",ar:"يُقِرّ / يُعتَرِف بـ",d:"Accept or confirm something",ex:"Please acknowledge the receipt of this email."},
+  {w:"Alternatively",p:"adv",ar:"بدلاً من ذلك / كخيار آخر",d:"Having another choice or option",ex:"Alternatively, we can reschedule for Wednesday at 2 PM."},
+  {w:"Apologize",p:"v",ar:"يعتذر / اعتذار",d:"Express regret or be sorry about something",ex:"I apologize for not attending the meeting yesterday."},
+  {w:"Available",p:"adj",ar:"متاح / متوفر",d:"Free or having time",ex:"I am available any time after 4 PM on weekdays."},
+  {w:"Clarify",p:"v",ar:"يوضح",d:"Make something clear",ex:"Could you please clarify the deadline for the project?"},
+  {w:"Attachment",p:"n",ar:"مرفق",d:"Files or documents sent along with an email",ex:"Please find a copy of the report sent as an attachment."},
+  {w:"Confirm",p:"v",ar:"يؤكد",d:"Verify or establish the truth of something",ex:"Please confirm your attendance at the meeting."},
+  {w:"Consider",p:"v",ar:"يُفكر في / يأخذ بعين الاعتبار",d:"Think carefully about something",ex:"We need to consider all options before making a decision."},
+  {w:"Document",p:"n/v",ar:"مستند / وثيقة / يوثق",d:"A recorded form of information",ex:"I will send you all the documents by next week."},
+  {w:"Inconvenience",p:"n",ar:"إزعاج / مضايقة",d:"Trouble or difficulty caused to someone's comfort",ex:"I apologize for any inconvenience this delay may have caused."},
+  {w:"Indicate",p:"v",ar:"يشير إلى / يدل على",d:"Point out or show",ex:"Please indicate your preference on the form."},
+  {w:"Issue",p:"n",ar:"مشكلة / قضية",d:"A matter or a problem",ex:"We will discuss this issue in our next meeting."},
+  {w:"Prompt",p:"adj",ar:"سريع / فوري",d:"Without delay; quick; on time",ex:"Thank you for your prompt reply to my message."},
+  {w:"Regarding",p:"prep",ar:"بخصوص / فيما يتعلق بـ",d:"About or concerning",ex:"I am writing to you regarding your job application."},
+  {w:"Reminder",p:"n",ar:"تذكير",d:"Something to help you remember something",ex:"This is a reminder regarding tomorrow's meeting."},
+  {w:"Reschedule",p:"v",ar:"يُعيد جدولة",d:"Change the time of a planned event",ex:"Due to some issues, we need to reschedule the meeting."},
+  {w:"Urgent",p:"adj",ar:"عاجل",d:"Requiring immediate attention",ex:"Your urgent attention to this matter is required."},
+  {w:"Update",p:"v/n",ar:"تحديث / يُحدِّث",d:"Make something more current by adding new information",ex:"Please provide an update on the project's progress."}
+];
+const DD_ITEMS=[
+  {t:"Use a clear subject line",do:true},{t:"Be professional and polite",do:true},
+  {t:"Be concise (short and clear)",do:true},{t:"Use formal greetings (e.g. 'Dear Mr. Smith,')",do:true},
+  {t:"Sign with your full name and title",do:true},{t:"Proofread before sending",do:true},
+  {t:"Use emoji's 😊😂 in the email",do:false},{t:"Use contractions like 'I'll' or 'can't'",do:false},
+  {t:"Write one very long paragraph",do:false},{t:"Write the entire email in ALL CAPS",do:false},
+  {t:"Use informal greetings like 'Hey!' or 'Hi buddy!'",do:false},{t:"Ignore spelling and grammar mistakes",do:false}
+];
+const QUIZ=[
+  {q:"What does 'acknowledge' mean in a professional email?",o:["To ignore a message","To accept or confirm something","To send a reminder","To cancel a meeting"],a:1},
+  {q:"Which sentence uses 'regarding' correctly?",o:["I regarding the meeting.","Regarding is not formal.","I am writing regarding your job application.","Please regarding your answer."],a:2},
+  {q:"What does 'prompt' mean?",o:["Slow and careful","Polite and formal","Very detailed","Without delay; quick; on time"],a:3},
+  {q:"What is an 'attachment' in an email?",o:["The greeting line","The subject line","A file or document sent with the email","The sender's signature"],a:2},
+  {q:"What does 'reschedule' mean?",o:["Cancel a meeting permanently","Change the time of a planned event","Confirm the meeting time","Remind someone about a meeting"],a:1},
+  {q:"Which word means 'make something clear'?",o:["Confirm","Indicate","Clarify","Update"],a:2},
+  {q:"What is 'inconvenience'?",o:["A type of email attachment","A professional greeting","Quick and urgent action","Trouble or difficulty caused to someone's comfort"],a:3},
+  {q:"Which word means 'having another choice or option'?",o:["Urgently","Alternatively","Promptly","Regarding"],a:1},
+  {q:"Fill in the blank: 'I _____ for any inconvenience this change may cause.'",o:["confirm","indicate","update","apologize"],a:3},
+  {q:"Which sentence uses 'indicate' correctly?",o:["Please indicate your preference on the form.","The meeting was indicate yesterday.","I indicate you an attachment.","Indicate is a formal noun."],a:0}
+];
+
+let pts=0,curCard=0,flipped=false;
+let mRound=0,mSel=null,mMatched=0;
+let ddIdx=0,ddScore=0,ddItems=[],ddResults=[],ddLocked=false;
+let qIdx=0,qScore=0,qLocked=false,qOrder=[];
+let curSec='',lastScore='';
+const mRounds=[[0,1,2,3,4,5],[6,7,8,9,10,11],[12,13,14,15,16,17]];
+
+function go(id){
+  document.getElementById('home').style.display='none';
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');curSec=id;window.scrollTo(0,0);
+  if(id==='flash')initFlash();if(id==='match')initMatch();
+  if(id==='dodont')initDD();if(id==='fill')initFill();if(id==='quiz')initQuiz();
+}
+function goHome(){document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));document.getElementById('home').style.display='block';window.scrollTo(0,0);}
+function addPts(n){pts+=n;document.getElementById('totalPts').textContent=pts;}
+
+function initFlash(){curCard=0;flipped=false;renderCard();}
+function renderCard(){
+  const v=V[curCard];
+  document.getElementById('fword').textContent=v.w;document.getElementById('fpos').textContent='('+v.p+')';
+  document.getElementById('fdef').textContent=v.d;document.getElementById('far').textContent=v.ar;
+  document.getElementById('fex').textContent='"'+v.ex+'"';
+  document.getElementById('fcc').textContent='Card '+(curCard+1)+' / '+V.length;
+  document.getElementById('fpb').style.width=((curCard+1)/V.length*100)+'%';
+  document.getElementById('fc').classList.remove('flipped');flipped=false;
+}
+function flip(){flipped=!flipped;document.getElementById('fc').classList.toggle('flipped',flipped);}
+function nextCard(){if(curCard<V.length-1){curCard++;renderCard();}else toast('🎉 You reviewed all 18 words!');}
+function prevCard(){if(curCard>0){curCard--;renderCard();}}
+
+function initMatch(){mRound=0;mSel=null;mMatched=0;renderMRound();}
+function renderMRound(){
+  mSel=null;mMatched=0;document.getElementById('mnxt').style.display='none';
+  const idx=mRounds[mRound];
+  const words=idx.map(i=>({type:'w',idx:i,txt:V[i].w}));
+  const defs=idx.map(i=>({type:'d',idx:i,txt:V[i].d}));shufl(defs);
+  document.getElementById('minfo').textContent='Round '+(mRound+1)+' of 3 — Match 6 pairs!';
+  const g=document.getElementById('mgrid');g.innerHTML='';
+  for(let i=0;i<6;i++){g.appendChild(mkM(words[i]));g.appendChild(mkM(defs[i]));}
+}
+function mkM(item){
+  const d=document.createElement('div');d.className='m-item';d.textContent=item.txt;
+  d.dataset.type=item.type;d.dataset.idx=item.idx;d.onclick=()=>selM(d);return d;
+}
+function selM(el){
+  if(el.classList.contains('ok'))return;
+  if(!mSel){el.classList.add('sel');mSel=el;}
+  else{
+    if(el===mSel){el.classList.remove('sel');mSel=null;return;}
+    if(el.dataset.type===mSel.dataset.type){mSel.classList.remove('sel');el.classList.add('sel');mSel=el;return;}
+    if(el.dataset.idx===mSel.dataset.idx){
+      el.classList.remove('sel');el.classList.add('ok');mSel.classList.remove('sel');mSel.classList.add('ok');
+      mSel=null;mMatched++;addPts(5);toast('✓ Correct! +5 pts');
+      if(mMatched===6){setTimeout(()=>{
+        if(mRound<2)document.getElementById('mnxt').style.display='block';
+        else{document.getElementById('c-match').classList.add('done');showRes(18,18,0,'match','All Matched! 🎯');}
+      },500);}
+    }else{
+      el.classList.add('err');mSel.classList.add('err');const prev=mSel;mSel=null;
+      setTimeout(()=>{el.classList.remove('err');prev.classList.remove('err');},700);
+    }
+  }
+}
+function nextRound(){mRound++;renderMRound();}
+
+function initDD(){
+  ddItems=[...DD_ITEMS];shufl(ddItems);ddIdx=0;ddScore=0;ddResults=[];ddLocked=false;
+  document.getElementById('dds').textContent='0';document.getElementById('ddt').textContent=ddItems.length;
+  renderDDots();renderDDCard();document.getElementById('ddfb').style.display='none';
+}
+function renderDDCard(){
+  if(ddIdx>=ddItems.length){
+    document.getElementById('c-dodont').classList.add('done');
+    const p=ddScore*2;addPts(p);showRes(ddScore,ddItems.length,p,'dodont');return;
+  }
+  document.getElementById('dditem').textContent=ddItems[ddIdx].t;
+  document.getElementById('doBtn').disabled=false;document.getElementById('dontBtn').disabled=false;
+  document.getElementById('ddfb').style.display='none';ddLocked=false;
+}
+function renderDDots(){
+  const c=document.getElementById('dddots');c.innerHTML='';
+  ddItems.forEach((_,i)=>{const d=document.createElement('div');d.className='dd-dot';
+    if(i<ddIdx)d.classList.add(ddResults[i]?'ok':'bad');else if(i===ddIdx)d.classList.add('cur');c.appendChild(d);});
+}
+function ansDD(ans){
+  if(ddLocked)return;ddLocked=true;
+  document.getElementById('doBtn').disabled=true;document.getElementById('dontBtn').disabled=true;
+  const correct=ddItems[ddIdx].do===ans;ddResults[ddIdx]=correct;
+  const fb=document.getElementById('ddfb');
+  if(correct){fb.className='dd-fb ok';fb.textContent=ans?'✅ Correct! This IS good practice.':'✅ Correct! This should be avoided.';ddScore++;document.getElementById('dds').textContent=ddScore;}
+  else{fb.className='dd-fb bad';fb.textContent=ans?'❌ Not quite. This should be AVOIDED.':'❌ Not quite. This IS actually good practice!';}
+  fb.style.display='block';renderDDots();
+  setTimeout(()=>{ddIdx++;renderDDots();renderDDCard();},1800);
+}
+
+function initFill(){
+  const blanks=[
+    {a:'acknowledge',opts:shufl(['acknowledge','confirm','update'])},
+    {a:'urgent',opts:shufl(['urgent','prompt','important'])},
+    {a:'reschedule',opts:shufl(['reschedule','cancel','postpone'])},
+    {a:'attachment',opts:shufl(['attachment','document','reminder'])},
+    {a:'clarify',opts:shufl(['clarify','confirm','indicate'])},
+    {a:'apologize',opts:shufl(['apologize','acknowledge','consider'])}
+  ];
+  function sel(i,b){return`<select class="blank-sel" data-i="${i}" data-a="${b.a}"><option value="">▼</option>${b.opts.map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`;}
+  document.getElementById('ebox').innerHTML=`
+<p>Dear Mr. Smith,</p><br>
+<p>I hope you are doing well. I am writing to ${sel(0,blanks[0])} the meeting scheduled for this Thursday. However, due to an ${sel(1,blanks[1])} matter that has come up, I would like to request that we ${sel(2,blanks[2])} the meeting for Friday morning instead.</p><br>
+<p>Additionally, I have sent a document as an ${sel(3,blanks[3])} that provides the latest update on the project's progress. If anything is unclear, I would be happy to ${sel(4,blanks[4])} any points.</p><br>
+<p>I ${sel(5,blanks[5])} for any inconvenience this change might cause and appreciate your prompt response.</p><br>
+<p>Thank you for your understanding.<br><strong>Best regards,<br>Mona Mohamed<br>Assistant Manager</strong></p>`;
+  document.getElementById('fillres').textContent='';
+}
+function checkFill(){
+  const sels=document.querySelectorAll('.blank-sel');let ok=0;
+  sels.forEach(s=>{s.classList.remove('ok','bad');if(!s.value)return;if(s.value===s.dataset.a){s.classList.add('ok');ok++;}else s.classList.add('bad');});
+  const p=ok*5;document.getElementById('fillres').textContent=`You got ${ok}/6 correct! +${p} pts`;
+  if(ok>0)addPts(p);
+  if(ok===6){confetti();toast('🎉 Perfect!');document.getElementById('c-fill').classList.add('done');}
+}
+
+function initQuiz(){
+  qIdx=0;qScore=0;qLocked=false;
+  qOrder=Array.from({length:QUIZ.length},(_,i)=>i);shufl(qOrder);renderQ();
+}
+function renderQ(){
+  if(qIdx>=10){const p=qScore*5;addPts(p);document.getElementById('c-quiz').classList.add('done');showRes(qScore,10,p,'quiz');return;}
+  const qi=QUIZ[qOrder[qIdx]];
+  document.getElementById('qfill').style.width=(qIdx/10*100)+'%';
+  document.getElementById('qnum').textContent='Question '+(qIdx+1)+' / 10';
+  document.getElementById('qtext').textContent=qi.q;
+  document.getElementById('qfb').style.display='none';
+  const nxt=document.getElementById('qnxt');nxt.style.visibility='hidden';
+  const opts=document.getElementById('qopts');opts.innerHTML='';
+  const so=qi.o.map((o,i)=>({txt:o,oi:i}));shufl(so);
+  so.forEach(opt=>{const b=document.createElement('button');b.className='q-opt';b.textContent=opt.txt;b.onclick=()=>ansQ(b,opt.oi,qi.a,so);opts.appendChild(b);});
+  qLocked=false;
+}
+function ansQ(btn,sel,ans,so){
+  if(qLocked)return;qLocked=true;
+  document.querySelectorAll('.q-opt').forEach(b=>b.classList.add('dis'));
+  const correct=sel===ans;
+  if(correct){btn.classList.add('cor');qScore++;addPts(5);toast('+5 pts! Correct! ✓');}
+  else{btn.classList.add('wrg');document.querySelectorAll('.q-opt').forEach(b=>{if(!b.classList.contains('wrg')){const o=so.find(x=>x.txt===b.textContent);if(o&&o.oi===ans)b.classList.add('cor');}});}
+  const fb=document.getElementById('qfb');
+  fb.className='q-fb '+(correct?'ok':'bad');
+  fb.textContent=correct?'✅ Correct! Well done!':'❌ Not quite — the correct answer is highlighted above.';
+  fb.style.display='block';
+  const nxt=document.getElementById('qnxt');nxt.textContent=qIdx<9?'Next Question →':'See Results 🏆';nxt.style.visibility='visible';
+}
+function nextQ(){qIdx++;renderQ();}
+
+function showRes(score,total,earned,from,customTitle){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.getElementById('results').classList.add('on');
+  lastScore=score+'/'+total;
+  const pct=Math.round(score/total*100);
+  document.getElementById('rscore').textContent=score+'/'+total;
+  document.getElementById('rlbl').textContent='+'+earned+' points earned!';
+  let g,icon,h;
+  if(pct>=90){g='Excellent! 🌟';icon='🏆';h='Outstanding!';document.getElementById('rgrade').className='res-grade gA';confetti();}
+  else if(pct>=75){g='Very Good! 👏';icon='🥈';h='Well Done!';document.getElementById('rgrade').className='res-grade gB';}
+  else if(pct>=60){g='Good! Keep Going! 💪';icon='🥉';h='Keep Practicing!';document.getElementById('rgrade').className='res-grade gC';}
+  else{g='Study More & Try Again! 📚';icon='📖';h='Keep Studying!';document.getElementById('rgrade').className='res-grade gD';}
+  document.getElementById('rgrade').textContent=g;
+  document.getElementById('ricon').textContent=icon;
+  document.getElementById('rh').textContent=customTitle||h;
+  document.getElementById('rretry').onclick=()=>go(from);
+  window.scrollTo(0,0);
+}
+
+// CERTIFICATE
+function openCert(){
+  document.getElementById('certScore').textContent=lastScore||'—';
+  document.getElementById('certPts').textContent=pts;
+  const now=new Date();
+  document.getElementById('certDate').textContent=now.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('certOverlay').classList.add('show');
+}
+function closeCert(){document.getElementById('certOverlay').classList.remove('show');}
+function updateCertName(){
+  const n=document.getElementById('certNameInput').value.trim();
+  if(n)document.getElementById('certStudentName').textContent=n;
+}
+document.getElementById('certNameInput').addEventListener('keydown',e=>{if(e.key==='Enter')updateCertName();});
+
+function shufl(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function confetti(){
+  const cols=['#5ccfef','#f4a261','#4caf50','#ffd166','#e74c3c','#c77dff'];
+  for(let i=0;i<70;i++){const c=document.createElement('div');c.className='cp';
+    c.style.cssText=`left:${Math.random()*100}vw;background:${cols[Math.floor(Math.random()*cols.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1.8+Math.random()*2}s;animation-delay:${Math.random()*.6}s;width:${6+Math.random()*10}px;height:${6+Math.random()*10}px;`;
+    document.body.appendChild(c);setTimeout(()=>c.remove(),3500);}
+}
+</script>
+</body>
+</html>
